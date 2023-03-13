@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  remote-team-building backend infrastructure
+
+Globals:
+  Function:
+    Runtime: java8
+    MemorySize: 512
+    CodeUri: RemoteTeamBuilding
+    Environment:
+      Variables:
+        PARAM1: VALUE
+        JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+
+Resources:
+  ListAllGames:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: mainWebsite.handlers.ListAllGames
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GamesTable
+      Events:
+        RemoteTeamBuilding:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+
+  GetGamesWithFilter:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: mainWebsite.handlers.GetGamesWithFilter
+      Events:
+        RemoteTeamBuilding:
+          Type: Api
+          Properties:
+            Path: /hellothere
+            Method: get
+
+  GamesTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: games
+      PrimaryKey:
+        Name: id
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      SSESpecification:
+        SSEEnabled:
+          true
+
+
